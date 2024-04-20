@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from scipy.stats import ttest_ind
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
 
 filePathBefore = 'C:\\Users\\patgh\\Documents\\SaxionCMGT\\Year 2\\Term 3\\Advanced Tools\\Data From Smart Boats\\pirateBoatsData250Generations.csv'
 filePathAfter = 'C:\\Users\\patgh\\Documents\\SaxionCMGT\\Year 2\\Term 3\\Advanced Tools\\Data From Smart Boats\\pirateBoatsData250GenerationsQuadraticUtil.csv'
@@ -40,6 +43,43 @@ data_after['GenerationBin'] = pd.cut(data_after['Generation'], bins=generation_b
 
 avg_points_before = data_before.groupby('GenerationBin')['Points'].mean()
 avg_points_after = data_after.groupby('GenerationBin')['Points'].mean()
+
+# calculate volatility
+volatility_before = data_before.groupby('GenerationBin')['Points'].std()
+volatility_after = data_after.groupby('GenerationBin')['Points'].std()
+
+# regression analysis
+features = ['Moving Speed', 'Steps', 'Ray Radius', 'Sight', 'Box Weight', 'Weight']
+X_before = data_before[features]
+y_before = data_before['Points']
+X_after = data_after[features]
+y_after = data_after['Points']
+
+# split the data into training and test sets
+X_train_before, X_test_before, y_train_before, y_test_before = train_test_split(X_before, y_before, test_size=0.2, random_state=42)
+X_train_after, X_test_after, y_train_after, y_test_after = train_test_split(X_after, y_after, test_size=0.2, random_state=42)
+
+# train the linear regression model
+regressor_before = LinearRegression()
+regressor_after = LinearRegression()
+
+# fit the model
+regressor_before.fit(X_train_before, y_train_before)
+regressor_after.fit(X_train_after, y_train_after)
+
+# make predictions
+y_pred_before = regressor_before.predict(X_test_before)
+y_pred_after = regressor_after.predict(X_test_after)
+
+# model evaluation
+mse_before = mean_squared_error(y_test_before, y_pred_before)
+mse_after = mean_squared_error(y_test_after, y_pred_after)
+r2_before = r2_score(y_test_before, y_pred_before)
+r2_after = r2_score(y_test_after, y_pred_after)
+
+print(f'Before Utility change - MSE: {mse_before}, R^2: {r2_before}')
+print(f'After Utility change - MSE: {mse_after}, R^2: {r2_after}')
+
 
 plt.figure(figsize=(15, 5))
 bar_width = 0.4
