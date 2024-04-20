@@ -1,0 +1,2 @@
+FILE_PATH_BEFORE = 'C:\\Users\\patgh\\Documents\\SaxionCMGT\\Year 2\\Term 3\\Advanced Tools\\Data From Smart Boats\\pirateBoatsData250Generations.csv'
+FILE_PATH_AFTER = 'C:\\Users\\patgh\\Documents\\SaxionCMGT\\Year 2\\Term 3\\Advanced Tools\\Data From Smart Boats\\pirateBoatsData250GenerationsQuadraticUtil.csv'
