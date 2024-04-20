@@ -9,13 +9,7 @@ from scipy.stats import ttest_ind
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
-from config import FILE_PATH_BEFORE, FILE_PATH_AFTER
-
-
-def load_data():
-    data_before = pd.read_csv(FILE_PATH_BEFORE)
-    data_after = pd.read_csv(FILE_PATH_AFTER)
-    return data_before, data_after
+from config import test_configurations
 
 
 def descriptive_statistics(data_before, data_after):
@@ -32,7 +26,7 @@ def t_test(data_before, data_after):
     return significance
 
 
-def plot_data(data_before, data_after):
+def plot_data(data_before, data_after, label_before, label_after):
     bin_size = 5
     max_generation = min(data_before['Generation'].max(), data_after['Generation'].max())
     generation_bins = range(0, max_generation + bin_size, bin_size)
@@ -47,14 +41,14 @@ def plot_data(data_before, data_after):
     volatility_before = data_before.groupby('GenerationBin')['Points'].std()
     volatility_after = data_after.groupby('GenerationBin')['Points'].std()
 
-    plot_average_points(avg_points_before, avg_points_after)
-    plot_moving_speed(data_before, data_after)
-    plot_steps(data_before, data_after)
-    plot_ray_radius(data_before, data_after)
-    plot_sight(data_before, data_after)
-    plot_box_weight(data_before, data_after)
-    plot_boat_weight(data_before, data_after)
-    plot_volatility(volatility_before, volatility_after)
+    plot_average_points(avg_points_before, avg_points_after, label_before, label_after)
+    plot_moving_speed(data_before, data_after, label_before, label_after)
+    plot_steps(data_before, data_after, label_before, label_after)
+    plot_ray_radius(data_before, data_after, label_before, label_after)
+    plot_sight(data_before, data_after, label_before, label_after)
+    plot_box_weight(data_before, data_after, label_before, label_after)
+    plot_boat_weight(data_before, data_after, label_before, label_after)
+    plot_volatility(volatility_before, volatility_after, label_before, label_after)
 
     pass
 
@@ -100,33 +94,33 @@ def regression_analysis(data_before, data_after):
     pass
 
 
-def plot_average_points(avg_points_before, avg_points_after):
+def plot_average_points(avg_points_before, avg_points_after, label_before, label_after):
     plt.figure(figsize=(15, 5))
     bar_width = 0.4
 
     index = np.arange(len(avg_points_before))
 
-    plt.bar(index, avg_points_before, width=bar_width, color='red', label='Linear Utility Function')
-    plt.bar(index + bar_width, avg_points_after, width=bar_width, color='blue', label='Quadratic Utility Function')
+    plt.bar(index, avg_points_before, width=bar_width, color=test_configurations[label_before]['color'], label=test_configurations[label_before]['title'])
+    plt.bar(index + bar_width, avg_points_after, width=bar_width, color=test_configurations[label_after]['color'], label=test_configurations[label_after]['title'])
 
     plt.xlabel('Generations', fontweight='bold')
     plt.ylabel('Average Points', fontweight='bold')
     bin_labels = [f'{int(bin.left)}-{int(bin.right) - 1}' for bin in avg_points_before.index]
 
     plt.xticks(index + bar_width / 2, bin_labels, rotation=45)
-    plt.title('Average Points Every Five Generations')
+    plt.title(f'Average Points Every Five Generations: {test_configurations[label_before]["title"]} vs. {test_configurations[label_after]["title"]}')
     plt.legend()
     plt.tight_layout()
     plt.show()
     pass
 
 
-def plot_moving_speed(data_before, data_after):
+def plot_moving_speed(data_before, data_after, label_before, label_after):
     sns.set_style('whitegrid')
     plt.figure(figsize=(15, 5))
-    sns.lineplot(data=data_before, x='Generation', y='Moving Speed', label='Linear Utility Function', color='red')
-    sns.lineplot(data=data_after, x='Generation', y='Moving Speed', label='Quadratic Utility Function', color='blue')
-    plt.title('Comparison of Moving Speed Over Generations')
+    sns.lineplot(data=data_before, x='Generation', y='Moving Speed', label= test_configurations[label_before]['title'], color=test_configurations[label_before]['color'])
+    sns.lineplot(data=data_after, x='Generation', y='Moving Speed', label=test_configurations[label_after]['title'], color=test_configurations[label_after]['color'])
+    plt.title(f'Comparison of Moving Speed Over Generations: {test_configurations[label_before]["title"]} vs. {test_configurations[label_after]["title"]}')
     plt.xlabel('Generation')
     plt.ylabel('Moving Speed')
     plt.legend()
@@ -134,12 +128,12 @@ def plot_moving_speed(data_before, data_after):
     pass
 
 
-def plot_steps(data_before, data_after):
+def plot_steps(data_before, data_after, label_before, label_after):
     sns.set_style('whitegrid')
     plt.figure(figsize=(15, 5))
-    sns.lineplot(data=data_before, x='Generation', y='Steps', label='Linear Utility Function', color='red')
-    sns.lineplot(data=data_after, x='Generation', y='Steps', label='Quadratic Utility Function', color='blue')
-    plt.title('Comparison of Steps Over Generations')
+    sns.lineplot(data=data_before, x='Generation', y='Steps', label=test_configurations[label_before]['title'], color=test_configurations[label_before]['color'])
+    sns.lineplot(data=data_after, x='Generation', y='Steps', label=test_configurations[label_after]['title'], color=test_configurations[label_after]['color'])
+    plt.title(f'Comparison of Steps Over Generations: {test_configurations[label_before]["title"]} vs. {test_configurations[label_after]["title"]}')
     plt.xlabel('Generation')
     plt.ylabel('Steps')
     plt.legend()
@@ -148,12 +142,12 @@ def plot_steps(data_before, data_after):
     pass
 
 
-def plot_ray_radius(data_before, data_after):
+def plot_ray_radius(data_before, data_after, label_before, label_after):
     sns.set_style('whitegrid')
     plt.figure(figsize=(15, 5))
-    sns.lineplot(data=data_before, x='Generation', y='Ray Radius', label='Linear Utility Function', color='red')
-    sns.lineplot(data=data_after, x='Generation', y='Ray Radius', label='Quadratic Utility Function', color='blue')
-    plt.title('Comparison of Ray Radius Over Generations')
+    sns.lineplot(data=data_before, x='Generation', y='Ray Radius', label=test_configurations[label_before]['title'], color=test_configurations[label_before]['color'])
+    sns.lineplot(data=data_after, x='Generation', y='Ray Radius', label=test_configurations[label_after]['title'], color=test_configurations[label_after]['color'])
+    plt.title(f'Comparison of Ray Radius Over Generations: {test_configurations[label_before]["title"]} vs. {test_configurations[label_after]["title"]}')
     plt.xlabel('Generation')
     plt.ylabel('Ray Radius')
     plt.legend()
@@ -161,12 +155,12 @@ def plot_ray_radius(data_before, data_after):
     pass
 
 
-def plot_sight(data_before, data_after):
+def plot_sight(data_before, data_after, label_before, label_after):
     sns.set_style('whitegrid')
     plt.figure(figsize=(15, 5))
-    sns.lineplot(data=data_before, x='Generation', y='Sight', label='Linear Utility Function', color='red')
-    sns.lineplot(data=data_after, x='Generation', y='Sight', label='Quadratic Utility Function', color='blue')
-    plt.title('Comparison of Sight Over Generations')
+    sns.lineplot(data=data_before, x='Generation', y='Sight', label=test_configurations[label_before]['title'], color=test_configurations[label_before]['color'])
+    sns.lineplot(data=data_after, x='Generation', y='Sight', label=test_configurations[label_after]['title'], color=test_configurations[label_after]['color'])
+    plt.title(f'Comparison of Sight Over Generations: {test_configurations[label_before]["title"]} vs. {test_configurations[label_after]["title"]}')
     plt.xlabel('Generation')
     plt.ylabel('Sight')
     plt.legend()
@@ -174,12 +168,12 @@ def plot_sight(data_before, data_after):
     pass
 
 
-def plot_box_weight(data_before, data_after):
+def plot_box_weight(data_before, data_after, label_before, label_after):
     sns.set_style('whitegrid')
     plt.figure(figsize=(15, 5))
-    sns.lineplot(data=data_before, x='Generation', y='Box Weight', label='Linear Utility Function', color='red')
-    sns.lineplot(data=data_after, x='Generation', y='Box Weight', label='Quadratic Utility Function', color='blue')
-    plt.title('Comparison of Box Weight Over Generations')
+    sns.lineplot(data=data_before, x='Generation', y='Box Weight', label=test_configurations[label_before]['title'], color=test_configurations[label_before]['color'])
+    sns.lineplot(data=data_after, x='Generation', y='Box Weight', label=test_configurations[label_after]['title'], color=test_configurations[label_after]['color'])
+    plt.title(f'Comparison of Box Weight Over Generations: {test_configurations[label_before]["title"]} vs. {test_configurations[label_after]["title"]}')
     plt.xlabel('Generation')
     plt.ylabel('Box Weight')
     plt.legend()
@@ -187,12 +181,12 @@ def plot_box_weight(data_before, data_after):
     pass
 
 
-def plot_boat_weight(data_before, data_after):
+def plot_boat_weight(data_before, data_after, label_before, label_after):
     sns.set_style('whitegrid')
     plt.figure(figsize=(15, 5))
-    sns.lineplot(data=data_before, x='Generation', y='Weight', label='Linear Utility Function', color='red')
-    sns.lineplot(data=data_after, x='Generation', y='Weight', label='Quadratic Utility Function', color='blue')
-    plt.title('Comparison of Boat Weight Over Generations')
+    sns.lineplot(data=data_before, x='Generation', y='Weight', label=test_configurations[label_before]['title'], color=test_configurations[label_before]['color'])
+    sns.lineplot(data=data_after, x='Generation', y='Weight', label=test_configurations[label_after]['title'], color=test_configurations[label_after]['color'])
+    plt.title(f'Comparison of Boat Weight Over Generations: {test_configurations[label_before]["title"]} vs. {test_configurations[label_after]["title"]}')
     plt.xlabel('Generation')
     plt.ylabel('Boat Weight')
     plt.legend()
@@ -200,14 +194,14 @@ def plot_boat_weight(data_before, data_after):
     pass
 
 
-def plot_volatility(volatility_before, volatility_after):
+def plot_volatility(volatility_before, volatility_after, label_before, label_after):
     bin_size = 5
     plt.figure(figsize=(15, 7))
     plt.plot(volatility_before.index.categories.left + (bin_size / 2), volatility_before,
-             label='Volatility Before Utility Change', color='red')
+             label=test_configurations[label_before]['title'], color=test_configurations[label_before]['color'])
     plt.plot(volatility_after.index.categories.left + (bin_size / 2), volatility_after,
-             label='Volatility After Utility Change', color='blue')
-    plt.title('Volatility of Points Over Generations')
+             label=test_configurations[label_after]['title'], color=test_configurations[label_after]['color'])
+    plt.title(f'Volatility of Points Over Generations: {test_configurations[label_before]["title"]} vs. {test_configurations[label_after]["title"]}')
     plt.xlabel('Generation')
     plt.ylabel('Standard Deviation of Points')
     plt.legend()
@@ -284,12 +278,17 @@ def prediction_accuracy_plot(y_test_before, y_pred_before, y_test_after, y_pred_
     plt.show()
     pass
 
+def load_data(label_before, label_after):
+    data_before = pd.read_csv(test_configurations[label_before]['filePathNormal'])
+    data_after = pd.read_csv(test_configurations[label_after]['filePathNormal'])
+    return data_before, data_after
 
-def main():
-    data_before, data_after = load_data()
+
+def main(testType_before, testType_after):
+    data_before, data_after = load_data(testType_before, testType_after)
     descriptive_statistics(data_before, data_after)
     significance = t_test(data_before, data_after)
-    plot_data(data_before, data_after)
+    plot_data(data_before, data_after, testType_before, testType_after)
     regression_analysis(data_before, data_after)
     if significance:
         print('The change in utility function has a statistically significant effect on the points.')
@@ -299,4 +298,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main('exponential', 'logarithmic')
